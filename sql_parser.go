@@ -3,13 +3,12 @@ package goose
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"regexp"
 	"strings"
 	"sync"
-
-	"errors"
 )
 
 type parserState int
@@ -83,7 +82,7 @@ func parseSQLMigration(r io.Reader, direction bool) (stmts []string, useTx bool,
 				case start:
 					stateMachine.Set(gooseUp)
 				default:
-					return nil, false, fmt.Errorf("duplicate '-- +goose Up' annotations; stateMachine=%v, see https://github.com/pressly/goose#sql-migrations", stateMachine)
+					return nil, false, fmt.Errorf("duplicate '-- +goose Up' annotations; stateMachine=%v, see https://github.com/krestkrest/goose#sql-migrations", stateMachine)
 				}
 				continue
 
@@ -93,7 +92,7 @@ func parseSQLMigration(r io.Reader, direction bool) (stmts []string, useTx bool,
 				case gooseUp, gooseStatementEndUp:
 					stateMachine.Set(gooseDown)
 				default:
-					return nil, false, fmt.Errorf("must start with '-- +goose Up' annotation, stateMachine=%v, see https://github.com/pressly/goose#sql-migrations", stateMachine)
+					return nil, false, fmt.Errorf("must start with '-- +goose Up' annotation, stateMachine=%v, see https://github.com/krestkrest/goose#sql-migrations", stateMachine)
 				}
 				continue
 
@@ -105,7 +104,7 @@ func parseSQLMigration(r io.Reader, direction bool) (stmts []string, useTx bool,
 				case gooseDown, gooseStatementEndDown:
 					stateMachine.Set(gooseStatementBeginDown)
 				default:
-					return nil, false, fmt.Errorf("'-- +goose StatementBegin' must be defined after '-- +goose Up' or '-- +goose Down' annotation, stateMachine=%v, see https://github.com/pressly/goose#sql-migrations", stateMachine)
+					return nil, false, fmt.Errorf("'-- +goose StatementBegin' must be defined after '-- +goose Up' or '-- +goose Down' annotation, stateMachine=%v, see https://github.com/krestkrest/goose#sql-migrations", stateMachine)
 				}
 				continue
 
@@ -117,7 +116,7 @@ func parseSQLMigration(r io.Reader, direction bool) (stmts []string, useTx bool,
 				case gooseStatementBeginDown:
 					stateMachine.Set(gooseStatementEndDown)
 				default:
-					return nil, false, errors.New("'-- +goose StatementEnd' must be defined after '-- +goose StatementBegin', see https://github.com/pressly/goose#sql-migrations")
+					return nil, false, errors.New("'-- +goose StatementEnd' must be defined after '-- +goose StatementBegin', see https://github.com/krestkrest/goose#sql-migrations")
 				}
 
 			case "+goose NO TRANSACTION":
@@ -161,7 +160,7 @@ func parseSQLMigration(r io.Reader, direction bool) (stmts []string, useTx bool,
 				continue
 			}
 		default:
-			return nil, false, fmt.Errorf("failed to parse migration: unexpected state %q on line %q, see https://github.com/pressly/goose#sql-migrations", stateMachine, line)
+			return nil, false, fmt.Errorf("failed to parse migration: unexpected state %q on line %q, see https://github.com/krestkrest/goose#sql-migrations", stateMachine, line)
 		}
 
 		switch stateMachine.Get() {
@@ -196,7 +195,7 @@ func parseSQLMigration(r io.Reader, direction bool) (stmts []string, useTx bool,
 
 	switch stateMachine.Get() {
 	case start:
-		return nil, false, errors.New("failed to parse migration: must start with '-- +goose Up' annotation, see https://github.com/pressly/goose#sql-migrations")
+		return nil, false, errors.New("failed to parse migration: must start with '-- +goose Up' annotation, see https://github.com/krestkrest/goose#sql-migrations")
 	case gooseStatementBeginUp, gooseStatementBeginDown:
 		return nil, false, errors.New("failed to parse migration: missing '-- +goose StatementEnd' annotation")
 	}

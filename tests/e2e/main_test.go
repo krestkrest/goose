@@ -11,8 +11,8 @@ import (
 	"syscall"
 	"testing"
 
-	"github.com/pressly/goose/v3/internal/check"
-	"github.com/pressly/goose/v3/internal/testdb"
+	"github.com/krestkrest/goose/v3/internal/check"
+	"github.com/krestkrest/goose/v3/internal/testdb"
 )
 
 const (
