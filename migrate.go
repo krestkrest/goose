@@ -242,7 +242,12 @@ func versionFilter(v, current, target int64) bool {
 func EnsureDBVersion(db *sql.DB) (int64, error) {
 	rows, err := GetDialect().dbVersionQuery(db)
 	if err != nil {
-		return 0, createVersionTable(db)
+		createErr := createVersionTable(db)
+		if createErr != nil {
+			return 0, fmt.Errorf("failed to get rows: %w: failed to create version table %w",
+				err, createErr)
+		}
+		return 0, nil
 	}
 	defer rows.Close()
 
